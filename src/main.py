@@ -75,8 +75,8 @@ def main():
 	n_episode_training = 1000
 	n_episode_testing = 100
 	open_cost = 3.3
-	#db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
-	db_type = 'PairSamplerDB'; db = 'randjump_100,1(10, 30)[]_'; Sampler = PairSampler
+	db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
+	#db_type = 'PairSamplerDB'; db = 'randjump_100,1(10, 30)[]_'; Sampler = PairSampler
 	batch_size = 8
 	learning_rate = 1e-4
 	discount_factor = 0.8
@@ -94,7 +94,8 @@ def main():
 	agent = Agent(model, discount_factor=discount_factor, batch_size=batch_size)
 	visualizer = Visualizer(env.action_labels)
 
-	fld_save = os.path.join(OUTPUT_FLD, sampler.title, model.model_name, 
+	time_string = time.strftime("%Y_%m_%d_%H_%M_%S")
+	fld_save = os.path.join(OUTPUT_FLD, sampler.title + time_string, model.model_name, 
 		str((env.window_state, sampler.window_episode, agent.batch_size, learning_rate,
 			agent.discount_factor, exploration_decay, env.open_cost)))
 	
