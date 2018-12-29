@@ -72,7 +72,7 @@ def main():
 	"""
 
 	model_type = 'conv'; exploration_init = 1.; fld_load = None
-	n_episode_training = 1000
+	n_episode_training = 1
 	n_episode_testing = 100
 	open_cost = 3.3
 	# db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
@@ -111,7 +111,7 @@ def main():
 	#agent.model = load_model(os.path.join(fld_save,'model'), learning_rate)
 
 	#print('='*20+'\nin-sample testing\n'+'='*20)
-	simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
+	# simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
 
 	"""
 	fld = os.path.join('data',db_type,db+'B')

@@ -22,7 +22,7 @@ class Simulator:
 		while not done:
 			if print_t:
 				print(self.env.t)
-    
+
 
 			action = self.agent.act(state, exploration, valid_actions)
 			next_state, reward, done, valid_actions = self.env.step(action)
@@ -38,10 +38,12 @@ class Simulator:
 
 			state = next_state
 
+		print("cum_rewards", cum_rewards)
+
 		return cum_rewards, actions, states
 
 
-	def train(self, n_episode, 
+	def train(self, n_episode,
 		save_per_episode=10, exploration_decay=0.995, exploration_min=0.01, print_t=False, exploration_init=1.):
 
 		fld_model = os.path.join(self.fld_save,'model')
@@ -76,28 +78,28 @@ class Simulator:
 			MA_safe_total_rewards = np.median(safe_total_rewards[-MA_window:])
 
 			ss = [
-				str(n), self.env.title.replace(',',';'), '%.1f'%(exploration*100.), 
+				str(n), self.env.title.replace(',',';'), '%.1f'%(exploration*100.),
 				'%.1f'%(explored_total_rewards[-1]), '%.1f'%(safe_total_rewards[-1]),
 				'%.1f'%MA_total_rewards, '%.1f'%MA_safe_total_rewards,
 				]
-			
+
 			with open(path_record,'a') as f:
 				f.write(','.join(ss)+'\n')
 				print('\t'.join(ss))
 
-			
+
 			if n%save_per_episode == 0:
 				print('saving results...')
 				self.agent.save(fld_model)
 
 				self.visualizer.plot_a_episode(
-					self.env, self.agent.model, 
+					self.env, self.agent.model,
 					explored_cum_rewards, explored_actions,
 					safe_cum_rewards, safe_actions,
 					os.path.join(fld_save, 'episode_%i.png'%(n)))
 
 				self.visualizer.plot_episodes(
-					explored_total_rewards, safe_total_rewards, explorations, 
+					explored_total_rewards, safe_total_rewards, explorations,
 					os.path.join(fld_save, 'total_rewards.png'),
 					MA_window)
 
@@ -117,40 +119,40 @@ class Simulator:
 
 		for n in range(n_episode):
 			print('\ntesting...')
-			
+
 			safe_cum_rewards, safe_actions, _ = self.play_one_episode(0, training=False, rand_price=True)
 			safe_total_rewards.append(100.*safe_cum_rewards[-1]/self.env.max_profit)
 			MA_safe_total_rewards = np.median(safe_total_rewards[-MA_window:])
-			ss = [str(n), self.env.title.replace(',',';'), 
+			ss = [str(n), self.env.title.replace(',',';'),
 				'%.1f'%(safe_cum_rewards[-1]),
-				'%.1f'%(safe_total_rewards[-1]), 
+				'%.1f'%(safe_total_rewards[-1]),
 				'%.1f'%MA_safe_total_rewards]
-			
+
 			with open(path_record,'a') as f:
 				f.write(','.join(ss)+'\n')
 				print('\t'.join(ss))
 
-			
+
 			if n%save_per_episode == 0:
 				print('saving results...')
 
 				"""
 				self.visualizer.plot_a_episode(
-					self.env, self.agent.model, 
+					self.env, self.agent.model,
 					[np.nan]*len(safe_cum_rewards), [np.nan]*len(safe_actions),
 					safe_cum_rewards, safe_actions,
 					os.path.join(fld_save, 'episode_%i.png'%(n)))
 
 				self.visualizer.plot_episodes(
-					None, safe_total_rewards, None, 
+					None, safe_total_rewards, None,
 					os.path.join(fld_save, 'total_rewards.png'),
 					MA_window)
 					"""
-					
 
 
 
-	def __init__(self, agent, env, 
+
+	def __init__(self, agent, env,
 		visualizer, fld_save):
 
 		self.agent = agent
