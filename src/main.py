@@ -94,7 +94,7 @@ def main():
 	#return
 
 	agent = Agent(model, discount_factor=discount_factor, batch_size=batch_size)
-	# visualizer = Visualizer(env.action_labels)
+	visualizer = Visualizer(env.action_labels)
 
 	time_string = time.strftime("%Y_%m_%d_%H_%M_%S")
 	fld_save = os.path.join(OUTPUT_FLD, sampler.title + time_string, model.model_name,
