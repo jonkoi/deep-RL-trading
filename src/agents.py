@@ -2,7 +2,7 @@ from lib import *
 
 class Agent:
 
-	def __init__(self, model, 
+	def __init__(self, model,
 		batch_size=32, discount_factor=0.95):
 
 		self.model = model
@@ -35,6 +35,7 @@ class Agent:
 	def act(self, state, exploration, valid_actions):
 		if np.random.random() > exploration:
 			q_valid = self.get_q_valid(state, valid_actions)
+			print("q_valid", q_valid)
 			if np.nanmin(q_valid) != np.nanmax(q_valid):
 				return np.nanargmax(q_valid)
 		return random.sample(valid_actions, 1)[0]
@@ -44,8 +45,8 @@ class Agent:
 		makedirs(fld)
 
 		attr = {
-			'batch_size':self.batch_size, 
-			'discount_factor':self.discount_factor, 
+			'batch_size':self.batch_size,
+			'discount_factor':self.discount_factor,
 			#'memory':self.memory
 			}
 
@@ -68,7 +69,7 @@ def add_dim(x, shape):
 
 class QModelKeras:
 	# ref: https://keon.io/deep-q-learning/
-	
+
 	def init(self):
 		pass
 
@@ -107,7 +108,7 @@ class QModelKeras:
 		q = self.model.predict(
 			add_dim(state, self.state_shape)
 			)[0]
-		
+
 		if np.isnan(max(q)):
 			print('state'+str(state))
 			print('q'+str(q))
@@ -120,8 +121,8 @@ class QModelKeras:
 		q[action] = q_action
 
 		self.model.fit(
-			add_dim(state, self.state_shape), 
-			add_dim(q, (self.n_action,)), 
+			add_dim(state, self.state_shape),
+			add_dim(q, (self.n_action,)),
 			epochs=1, verbose=0)
 
 
@@ -130,24 +131,24 @@ class QModelMLP(QModelKeras):
 	# multi-layer perception (MLP), i.e., dense only
 
 	def init(self):
-		self.qmodel = 'MLP'	
+		self.qmodel = 'MLP'
 
 	def build_model(self, n_hidden, learning_rate, activation='relu'):
 
 		model = keras.models.Sequential()
 		model.add(keras.layers.Reshape(
-			(self.state_shape[0]*self.state_shape[1],), 
+			(self.state_shape[0]*self.state_shape[1],),
 			input_shape=self.state_shape))
 
 		for i in range(len(n_hidden)):
 			model.add(keras.layers.Dense(n_hidden[i], activation=activation))
 			#model.add(keras.layers.Dropout(drop_rate))
-		
+
 		model.add(keras.layers.Dense(self.n_action, activation='linear'))
 		model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=learning_rate))
 		self.model = model
 		self.model_name = self.qmodel + str(n_hidden)
-		
+
 
 
 class QModelRNN(QModelKeras):
@@ -170,7 +171,7 @@ class QModelRNN(QModelKeras):
 		model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=learning_rate))
 		self.model = model
 		self.model_name = self.qmodel + str(n_hidden) + str(dense_units)
-		
+
 
 
 class QModelLSTM(QModelRNN):
@@ -197,8 +198,8 @@ class QModelConv(QModelKeras):
 	def init(self):
 		self.qmodel = 'Conv'
 
-	def build_model(self, 
-		filter_num, filter_size, dense_units, 
+	def build_model(self,
+		filter_num, filter_size, dense_units,
 		learning_rate, activation='relu', dilation=None, use_pool=None):
 
 		if use_pool is None:
@@ -208,26 +209,26 @@ class QModelConv(QModelKeras):
 
 		model = keras.models.Sequential()
 		model.add(keras.layers.Reshape(self.state_shape, input_shape=self.state_shape))
-		
+
 		for i in range(len(filter_num)):
-			model.add(keras.layers.Conv1D(filter_num[i], kernel_size=filter_size[i], dilation_rate=dilation[i], 
+			model.add(keras.layers.Conv1D(filter_num[i], kernel_size=filter_size[i], dilation_rate=dilation[i],
 				activation=activation, use_bias=True))
 			if use_pool[i]:
 				model.add(keras.layers.MaxPooling1D(pool_size=2))
-		
+
 		model.add(keras.layers.Flatten())
 		for i in range(len(dense_units)):
 			model.add(keras.layers.Dense(dense_units[i], activation=activation))
 		model.add(keras.layers.Dense(self.n_action, activation='linear'))
 		model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=learning_rate))
-		
+
 		self.model = model
 
 		self.model_name = self.qmodel + str([a for a in
 			zip(filter_num, filter_size, dilation, use_pool)
 			])+' + '+str(dense_units)
 
-		
+
 
 class QModelConvRNN(QModelKeras):
 	"""
@@ -235,14 +236,14 @@ class QModelConvRNN(QModelKeras):
 	note param doesn't grow with len of sequence
 	"""
 
-	def _build_model(self, RNNLayer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate, 
+	def _build_model(self, RNNLayer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate,
 		conv_kernel_size=3, use_pool=False, activation='relu'):
 
 		model = keras.models.Sequential()
 		model.add(keras.layers.Reshape(self.state_shape, input_shape=self.state_shape))
 
 		for i in range(len(conv_n_hidden)):
-			model.add(keras.layers.Conv1D(conv_n_hidden[i], kernel_size=conv_kernel_size, 
+			model.add(keras.layers.Conv1D(conv_n_hidden[i], kernel_size=conv_kernel_size,
 				activation=activation, use_bias=True))
 			if use_pool:
 				model.add(keras.layers.MaxPooling1D(pool_size=2))
@@ -257,25 +258,25 @@ class QModelConvRNN(QModelKeras):
 		model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=learning_rate))
 		self.model = model
 		self.model_name = self.qmodel + str(conv_n_hidden) + str(RNN_n_hidden) + str(dense_units)
-		
+
 
 class QModelConvLSTM(QModelConvRNN):
 	def init(self):
 		self.qmodel = 'ConvLSTM'
-	def build_model(self, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate, 
+	def build_model(self, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate,
 		conv_kernel_size=3, use_pool=False, activation='relu'):
 		Layer = keras.layers.LSTM
-		self._build_model(Layer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate, 
+		self._build_model(Layer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate,
 		conv_kernel_size, use_pool, activation)
 
 
 class QModelConvGRU(QModelConvRNN):
 	def init(self):
 		self.qmodel = 'ConvGRU'
-	def build_model(self, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate, 
+	def build_model(self, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate,
 		conv_kernel_size=3, use_pool=False, activation='relu'):
 		Layer = keras.layers.GRU
-		self._build_model(Layer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate, 
+		self._build_model(Layer, conv_n_hidden, RNN_n_hidden, dense_units, learning_rate,
 		conv_kernel_size, use_pool, activation)
 
 
@@ -296,5 +297,3 @@ def load_model(fld, learning_rate):
 	qmodel = qmodels[s](None, None)
 	qmodel.load(fld, learning_rate)
 	return qmodel
-
-
