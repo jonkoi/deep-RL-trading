@@ -13,12 +13,16 @@ def read_data(date, instrument, time_step):
 
 
 class Sampler:
+	def __init__(self, game, fld=None):
+		self.n_var = 1
+		if game == 'load':
+			self.load_db(fld)
 
 	def load_db(self, fld):
-
 		self.db = pickle.load(open(os.path.join(fld, 'db.pickle'),'rb'))
 		param = json.load(open(os.path.join(fld, 'param.json'),'rb'))
 		self.i_db = 0
+		self.window_episode = param['window_episode']
 		self.n_db = param['n_episodes']
 		self.sample = self.__sample_db
 		for attr in param:
@@ -52,10 +56,8 @@ class Sampler:
 class PairSampler(Sampler):
 
 	def __init__(self, game,
-		window_episode=None, forecast_horizon_range=None, max_change_perc=10., noise_level=10., n_section=1,
-		fld=None, windows_transform=[]):
-
-		self.window_episode = window_episode
+		window_episode=None, forecast_horizon_range=None, max_change_perc=10., noise_level=10., n_section=1, windows_transform=[], fld=None):
+		super().__init__(game, fld=fld)
 		self.forecast_horizon_range = forecast_horizon_range
 		self.max_change_perc = max_change_perc
 		self.noise_level = noise_level
@@ -63,18 +65,16 @@ class PairSampler(Sampler):
 		self.windows_transform = windows_transform
 		self.n_var = 2 + len(self.windows_transform) # price, signal
 
-		self.attrs = ['title', 'window_episode', 'forecast_horizon_range', 
+		self.attrs = ['title', 'window_episode', 'forecast_horizon_range',
 			'max_change_perc', 'noise_level', 'n_section', 'n_var']
 		param_str = str((self.noise_level, self.forecast_horizon_range, self.n_section, self.windows_transform))
 
-		if game == 'load':
-			self.load_db(fld)
-		elif game in ['randwalk','randjump']:
+		if game in ['randwalk','randjump']:
 			self.__rand = getattr(self, '_PairSampler__'+game)
 			self.sample = self.__sample
 			self.title = game + param_str
-		else:
-			raise ValueError
+		# else:
+		# 	raise ValueError
 
 
 	def __randwalk(self, l):
@@ -135,13 +135,10 @@ class PairSampler(Sampler):
 
 class SinSampler(Sampler):
 
-	def __init__(self, game, 
-		window_episode=None, noise_amplitude_ratio=None, period_range=None, amplitude_range=None,
-		fld=None):
-
+	def __init__(self, game, noise_amplitude_ratio=None, period_range=None, amplitude_range=None, fld=None):
+		super().__init__(game, fld=fld)
 		self.n_var = 1	# price only
 
-		self.window_episode = window_episode
 		self.noise_amplitude_ratio = noise_amplitude_ratio
 		self.period_range = period_range
 		self.amplitude_range = amplitude_range
@@ -168,13 +165,11 @@ class SinSampler(Sampler):
 			self.title = 'ConcatHalfSin+Base'+param_str
 			self.base_period_range = (int(2*self.period_range[1]), 4*self.period_range[1])
 			self.base_amplitude_range = (20,80)
-		elif game == 'load':
-			self.load_db(fld)
-		else:
-			raise ValueError
+		# else:
+		# 	raise ValueError
 
 
-	def __rand_sin(self, 
+	def __rand_sin(self,
 		period_range=None, amplitude_range=None, noise_amplitude_ratio=None, full_episode=False):
 
 		if period_range is None:
@@ -222,13 +217,13 @@ class SinSampler(Sampler):
 			if len(p) > self.window_episode:
 				break
 		base, base_title = self.__rand_sin(
-			period_range=self.base_period_range, 
-			amplitude_range=self.base_amplitude_range, 
-			noise_amplitude_ratio=0., 
+			period_range=self.base_period_range,
+			amplitude_range=self.base_amplitude_range,
+			noise_amplitude_ratio=0.,
 			full_episode=True)
 		prices.append(p[:self.window_episode] + base)
 		return np.array(prices).T, 'concat sin + base: '+base_title
-			
+
 	def __sample_single_sin(self):
 		prices = []
 		funcs = []
@@ -251,7 +246,7 @@ def test_SinSampler():
 	game = 'concat_half_base'
 	instruments = ['fake']
 
-	sampler = SinSampler(game, 
+	sampler = SinSampler(game,
 		window_episode, noise_amplitude_ratio, period_range, amplitude_range)
 	n_episodes = 100
 	"""
@@ -272,9 +267,9 @@ def test_PairSampler():
 	game = 'randjump'
 	windows_transform = []
 
-	sampler = PairSampler(game, window_episode=180, forecast_horizon_range=fhr, 
+	sampler = PairSampler(game, window_episode=180, forecast_horizon_range=fhr,
 		n_section=n_section, noise_level=noise_level, max_change_perc=max_change_perc, windows_transform=windows_transform)
-	
+
 	#plt.plot(sampler.sample()[0]);plt.show()
 	#"""
 	n_episodes = 100
@@ -288,7 +283,8 @@ def test_PairSampler():
 
 if __name__ == '__main__':
 	#scan_match()
-	test_SinSampler()
+	# test_SinSampler()
 	#p = [1,2,3,2,1,2,3]
 	#print find_ideal(p)
-	test_PairSampler()
+	# test_PairSampler()
+	pass

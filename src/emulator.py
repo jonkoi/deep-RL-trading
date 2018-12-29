@@ -24,11 +24,11 @@ class Market:
 					which is self.state_shape
 
 	action 			three action
-					0:	empty, don't open/close. 
+					0:	empty, don't open/close.
 					1:	open a position
 					2: 	keep a position
 	"""
-	
+
 	def reset(self, rand_price=True):
 		self.empty = True
 		if rand_price:
@@ -50,7 +50,7 @@ class Market:
 		state = self.prices[t - self.window_state + 1: t + 1, :].copy()
 		for i in range(self.sampler.n_var):
 			norm = np.mean(state[:,i])
-			state[:,i] = (state[:,i]/norm - 1.)*100	
+			state[:,i] = (state[:,i]/norm - 1.)*100
 		return state
 
 	def get_valid_actions(self):
@@ -91,7 +91,7 @@ class Market:
 		return self.get_state(), reward, self.t == self.t_max, self.get_valid_actions()
 
 
-	def __init__(self, 
+	def __init__(self,
 		sampler, window_state, open_cost,
 		direction=1., risk_averse=0.):
 
