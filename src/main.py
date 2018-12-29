@@ -19,7 +19,7 @@ def get_model(model_type, env, learning_rate, fld_load):
 		hidden_size = [m]*layers
 		model = QModelMLP(env.state_shape, env.n_action)
 		model.build_model(hidden_size, learning_rate=learning_rate, activation='tanh')
-	
+
 	elif model_type == 'conv':
 
 		m = 16
@@ -33,7 +33,7 @@ def get_model(model_type, env, learning_rate, fld_load):
 		dilation = None
 		dense_units = [48,24]
 		model = QModelConv(env.state_shape, env.n_action)
-		model.build_model(filter_num, filter_size, dense_units, learning_rate, 
+		model.build_model(filter_num, filter_size, dense_units, learning_rate,
 			dilation=dilation, use_pool=use_pool)
 
 	elif model_type == 'RNN':
@@ -47,7 +47,7 @@ def get_model(model_type, env, learning_rate, fld_load):
 		print_t = True
 
 	elif model_type == 'ConvRNN':
-	
+
 		m = 8
 		conv_n_hidden = [m,m]
 		RNN_n_hidden = [m,m]
@@ -61,7 +61,7 @@ def get_model(model_type, env, learning_rate, fld_load):
 
 	else:
 		raise ValueError
-		
+
 	return model, print_t
 
 
@@ -72,7 +72,7 @@ def main():
 	"""
 
 	model_type = 'conv'; exploration_init = 1.; fld_load = None
-	n_episode_training = 1000
+	n_episode_training = 1
 	n_episode_testing = 100
 	open_cost = 3.3
 	db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
@@ -95,21 +95,21 @@ def main():
 	visualizer = Visualizer(env.action_labels)
 
 	time_string = time.strftime("%Y_%m_%d_%H_%M_%S")
-	fld_save = os.path.join(OUTPUT_FLD, sampler.title + time_string, model.model_name, 
+	fld_save = os.path.join(OUTPUT_FLD, sampler.title + time_string, model.model_name,
 		str((env.window_state, sampler.window_episode, agent.batch_size, learning_rate,
 			agent.discount_factor, exploration_decay, env.open_cost)))
-	
+
 	print('='*20)
 	print(fld_save)
 	print('='*20)
 
 	simulator = Simulator(agent, env, visualizer=visualizer, fld_save=fld_save)
-	simulator.train(n_episode_training, save_per_episode=1, exploration_decay=exploration_decay, 
+	simulator.train(n_episode_training, save_per_episode=1, exploration_decay=exploration_decay,
 		exploration_min=exploration_min, print_t=print_t, exploration_init=exploration_init)
 	#agent.model = load_model(os.path.join(fld_save,'model'), learning_rate)
 
 	#print('='*20+'\nin-sample testing\n'+'='*20)
-	simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
+	# simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
 
 	"""
 	fld = os.path.join('data',db_type,db+'B')
@@ -117,7 +117,7 @@ def main():
 	simulator.env.sampler = sampler
 	simulator.test(n_episode_testing, save_per_episode=1, subfld='out-of-sample testing')
 	"""
-	
+
 
 if __name__ == '__main__':
 	main()
