@@ -94,7 +94,7 @@ def main():
 	#return
 
 	agent = Agent(model, discount_factor=discount_factor, batch_size=batch_size)
-	visualizer = Visualizer(env.action_labels)
+	# visualizer = Visualizer(env.action_labels)
 
 	time_string = time.strftime("%Y_%m_%d_%H_%M_%S")
 	fld_save = os.path.join(OUTPUT_FLD, sampler.title + time_string, model.model_name,
@@ -111,7 +111,7 @@ def main():
 	#agent.model = load_model(os.path.join(fld_save,'model'), learning_rate)
 
 	#print('='*20+'\nin-sample testing\n'+'='*20)
-	# simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
+	simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
 
 
 	# fld = os.path.join('data',db_type,db+'B')
