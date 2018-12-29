@@ -37,7 +37,7 @@ class Simulator:
 				self.agent.replay()
 
 			state = next_state
-		print("cum-rewards", cum_rewards)
+		# print("cum-rewards", cum_rewards)
 		# print("actions", actions)
 		# print("states", states)
 
