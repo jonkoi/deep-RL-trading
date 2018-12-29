@@ -15,7 +15,7 @@ class Agent:
 		self.memory.append((state, action, reward, next_state, done, next_valid_actions))
 
 
-	def replay(self):
+	def replay(self): # Gradient descent
 		batch = random.sample(self.memory, min(len(self.memory), self.batch_size))
 		for state, action, reward, next_state, done, next_valid_actions in batch:
 			q = reward
