@@ -72,9 +72,9 @@ def main():
 	"""
 
 	model_type = 'conv'; exploration_init = 1.; fld_load = None
-	n_episode_training = 1
-	n_episode_testing = 100
-	open_cost = 3.3
+	n_episode_training = 2700
+	n_episode_testing = 91
+	open_cost = 0.0
 	# db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
 	#db_type = 'PairSamplerDB'; db = 'randjump_100,1(10, 30)[]_'; Sampler = PairSampler
 	batch_size = 8
@@ -113,12 +113,12 @@ def main():
 	#print('='*20+'\nin-sample testing\n'+'='*20)
 	# simulator.test(n_episode_testing, save_per_episode=1, subfld='in-sample testing')
 
-	"""
-	fld = os.path.join('data',db_type,db+'B')
+
+	# fld = os.path.join('data',db_type,db+'B')
+	fld = ('../data/forex/EURUSD_hour_close_test')
 	sampler = SinSampler('load',fld=fld)
 	simulator.env.sampler = sampler
 	simulator.test(n_episode_testing, save_per_episode=1, subfld='out-of-sample testing')
-	"""
 
 
 if __name__ == '__main__':

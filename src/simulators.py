@@ -38,7 +38,8 @@ class Simulator:
 
 			state = next_state
 
-		print("cum_rewards", cum_rewards)
+		# print("cum_rewards", cum_rewards)
+		# print("valid_actions", valid_actions)
 
 		return cum_rewards, actions, states
 
