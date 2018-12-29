@@ -30,7 +30,7 @@ class Market:
 	"""
 
 	def reset(self, rand_price=True):
-		self.empty = True
+		self.empty = 0
 		if rand_price:
 			prices, self.title = self.sampler.sample()
 			price = np.reshape(prices[:,0], prices.shape[0])
@@ -54,10 +54,12 @@ class Market:
 		return state
 
 	def get_valid_actions(self):
-		if self.empty:
-			return [0, 1]	# wait, open
-		else:
+		if self.empty == 0:
+			return [1,2,3]	# short, wait, buy
+		elif self.empty == -1:   # Shorted
 			return [0, 2]	# close, keep
+		elif self.empty == 1:  # Bought
+			return [2, 4]   # close, keep
 
 
 	def get_noncash_reward(self, t=None, empty=None):
@@ -66,7 +68,8 @@ class Market:
 		if empty is None:
 			empty = self.empty
 		reward = self.direction * (self.price[t+1] - self.price[t])
-		if empty:
+		if empty < 0: reward = -reward
+		if empty == 0:
 			reward -= self.open_cost
 		if reward < 0:
 			reward *= (1. + self.risk_averse)
@@ -74,15 +77,19 @@ class Market:
 
 
 	def step(self, action):
-
 		done = False
-		if action == 0:		# wait/close
+		if action == 2:		# wait/close
 			reward = 0.
-			self.empty = True
-		elif action == 1:	# open
+			self.empty = 0
+		elif action == 3:	# buy
 			reward = self.get_noncash_reward()
-			self.empty = False
-		elif action == 2:	# keep
+			self.empty = 1
+		elif action == 4:	# keep
+			reward = self.get_noncash_reward()
+		elif action == 1:  #short
+			reward = self.get_noncash_reward()
+			self.empty = -1
+		elif action == 0:  #keep
 			reward = self.get_noncash_reward()
 		else:
 			raise ValueError('no such action: '+str(action))
@@ -101,9 +108,9 @@ class Market:
 		self.direction = direction
 		self.risk_averse = risk_averse
 
-		self.n_action = 3
+		self.n_action = 5
 		self.state_shape = (window_state, self.sampler.n_var)
-		self.action_labels = ['empty','open','keep']
+		self.action_labels = ['keep_short', 'short','empty','buy','keep_buy']
 		self.t0 = window_state - 1
 
 

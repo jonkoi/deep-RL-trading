@@ -15,7 +15,7 @@ class Agent:
 		self.memory.append((state, action, reward, next_state, done, next_valid_actions))
 
 
-	def replay(self): # Gradient descent
+	def replay(self):
 		batch = random.sample(self.memory, min(len(self.memory), self.batch_size))
 		for state, action, reward, next_state, done, next_valid_actions in batch:
 			q = reward
@@ -26,7 +26,6 @@ class Agent:
 
 	def get_q_valid(self, state, valid_actions):
 		q = self.model.predict(state)
-		# print("q", q)
 		q_valid = [np.nan] * len(q)
 		for action in valid_actions:
 			q_valid[action] = q[action]

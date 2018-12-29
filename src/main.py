@@ -72,8 +72,8 @@ def main():
 	"""
 
 	model_type = 'conv'; exploration_init = 1.; fld_load = None
-	n_episode_training = 2700
-	n_episode_testing = 91
+	n_episode_training = 6377
+	n_episode_testing = 100
 	open_cost = 0.1
 	# db_type = 'SinSamplerDB'; db = 'concat_half_base_'; Sampler = SinSampler
 	#db_type = 'PairSamplerDB'; db = 'randjump_100,1(10, 30)[]_'; Sampler = PairSampler
@@ -82,7 +82,7 @@ def main():
 	discount_factor = 0.8
 	exploration_decay = 0.99
 	exploration_min = 0.01
-	window_state = 40
+	window_state = 96
 
 	# fld = os.path.join('..','data',db_type,db+'A')
 	fld = ('../data/forex/EURUSD_hour_close_train')

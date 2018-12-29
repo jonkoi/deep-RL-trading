@@ -19,7 +19,7 @@ class Sampler:
 			self.load_db(fld)
 
 	def load_db(self, fld):
-		self.db = pickle.load(open(os.path.join(fld, 'db.pickle'),'rb'))
+		self.db = pickle.load(open(os.path.join(fld, 'db9610.pickle'),'rb'))
 		param = json.load(open(os.path.join(fld, 'param.json'),'rb'))
 		self.i_db = 0
 		self.window_episode = param['window_episode']
@@ -37,7 +37,7 @@ class Sampler:
 			prices, title = self.sample()
 			db.append((prices, '[%i]_'%i+title))
 		os.makedirs(fld)	# don't overwrite existing fld
-		pickle.dump(db, open(os.path.join(fld, 'db.pickle'),'wb'))
+		pickle.dump(db, open(os.path.join(fld, 'db9610.pickle'),'wb'))
 		param = {'n_episodes':n_episodes}
 		for k in self.attrs:
 			param[k] = getattr(self, k)

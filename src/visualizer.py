@@ -22,14 +22,14 @@ class Visualizer:
 		self.action_labels = action_labels
 
 
-	def plot_a_episode(self, 
+	def plot_a_episode(self,
 		env, model,
-		explored_cum_rewards, explored_actions, 
+		explored_cum_rewards, explored_actions,
 		safe_cum_rewards, safe_actions,
 		fig_path):
 
 		f, axs = plt.subplots(3,1,sharex=True, figsize=(14,14))
-		ax_price, ax_action, ax_Q = axs  
+		ax_price, ax_action, ax_Q = axs
 
 		ls = ['-','--']
 		for i in range(min(2,env.prices.shape[1])):
@@ -48,15 +48,15 @@ class Visualizer:
 		ax_action.set_ylabel('action')
 		ax_action.set_yticks(range(self.n_action))
 		ax_action.legend(loc='best', frameon=False)
-		
-		style = ['k','r','b']
+
+		style = ['g','y','k','r','b']
 		qq = []
 		for t in range(env.t0):
 			qq.append([np.nan] * self.n_action)
 		for t in range(env.t0, env.t_max):
-			qq.append(model.predict(env.get_state(t))) 
+			qq.append(model.predict(env.get_state(t)))
 		for i in range(self.n_action):
-			ax_Q.plot([float(qq[t][i]) for t in range(len(qq))], 
+			ax_Q.plot([float(qq[t][i]) for t in range(len(qq))],
 				style[i], label=self.action_labels[i])
 		ax_Q.set_ylabel('Q')
 		ax_Q.legend(loc='best', frameon=False)
@@ -68,8 +68,8 @@ class Visualizer:
 
 
 
-	def plot_episodes(self, 
-		explored_total_rewards, safe_total_rewards, explorations, 
+	def plot_episodes(self,
+		explored_total_rewards, safe_total_rewards, explorations,
 		fig_path, MA_window=100):
 
 		f = plt.figure(figsize=(14,10))	# width, height in inch (100 pixel)
@@ -110,7 +110,7 @@ class Visualizer:
 
 		plt.savefig(fig_path)
 		plt.close()
-		
+
 
 
 
@@ -131,7 +131,7 @@ def test_visualizer():
 		col = action%ncol
 		ax = plt.subplot2grid((nrow, ncol), (row,col))
 		cax = ax.matshow(np.random.random((2,2)), cmap='RdYlBu_r', clim=clim)
-	
+
 
 	ax = plt.subplot2grid((nrow, ncol), (0,0), colspan=ncol-1)
 	cbar = f.colorbar(cax, ax=ax)
@@ -178,8 +178,8 @@ class VisualizerConv1D(VisualizerSequential):
 
 	def plot(self, x):
 
-		f = plt.figure(figsize=(30,30))	
-		
+		f = plt.figure(figsize=(30,30))
+
 		for i in range(self.n_channel):
 			ax = plt.subplot2grid(self.figshape, (0,i))
 			ax.plot(x[0,:,i], '.-')
@@ -209,4 +209,3 @@ class VisualizerConv1D(VisualizerSequential):
 		for w in ww:
 			print(w.shape)
 			print(w)
-
