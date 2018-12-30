@@ -1,6 +1,7 @@
 import random, os, datetime, pickle, json, keras, sys
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import numpy as np
 import time
 
